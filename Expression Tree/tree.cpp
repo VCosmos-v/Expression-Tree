@@ -136,19 +136,23 @@ ExpressionTree::ExpressionNode* ExpressionTree::clone(ExpressionNode* node) cons
     return newNode;
 }
 
+// (f1*f2 +- f3*f4) преобразуетс€ в умножение со скобками, если найден общий множитель.
 ExpressionTree::ExpressionNode* ExpressionTree::simplifyNode(ExpressionNode* node) {
     if (!node) return nullptr;
 
     node->left = simplifyNode(node->left);
     node->right = simplifyNode(node->right);
 
+    // ѕроверка применимости правила. ”прощение возможно только на узлах сложени€ или вычитани€.
     if (node->type == NodeType::OPERATOR && (node->value == "+" || node->value == "-")) {
         ExpressionNode* L = node->left;
         ExpressionNode* R = node->right;
 
+        // ѕроверка, что оба поддерева €вл€ютс€ операци€ми умножени€ *.
         if (L && R && L->type == NodeType::OPERATOR && L->value == "*" &&
             R->type == NodeType::OPERATOR && R->value == "*") {
 
+            // указатели на множители
             ExpressionNode* f1 = L->left;
             ExpressionNode* f2 = L->right;
             ExpressionNode* f3 = R->left;
